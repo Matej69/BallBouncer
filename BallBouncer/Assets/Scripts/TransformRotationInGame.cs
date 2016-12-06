@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class TransformRotationInGame : MonoBehaviour {
 
-    public bool canBeRotated = false;
+    public bool canBeRotated = false;    
 
     float lastFrameAngle = 0;
     
@@ -38,7 +38,7 @@ public class TransformRotationInGame : MonoBehaviour {
         if (MyInput.s_myInput.GetInputUp()) {
             isRotPointClicked = false;     
         }
-
+        
         HandleRotation();
 
         lastFrameinputPos = inputPos;
@@ -58,6 +58,10 @@ public class TransformRotationInGame : MonoBehaviour {
         PointClickedCheck();
         
         if (isRotPointClicked ) {
+            //this will skip that one frame where, on mobile devices, there would be big difference in angdle between lastTouchPos and touchPos
+            if (!MyInput.s_myInput.GetInputHold())
+                return;
+
             //for angle direction
             float angle = GetProperAngle(transform.position, inputPos);
             float dir = (angle - lastFrameAngle == 0) ? 0 : Mathf.Sign(angle - lastFrameAngle);

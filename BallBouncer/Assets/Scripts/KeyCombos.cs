@@ -15,7 +15,8 @@ public class KeyCombos : MonoBehaviour {
         SPEED_AREA,                 //S
         RESET_BALL,                 //R
         START_LINE,                 //Q
-        END_LINE                    //W
+        END_LINE,                   //W
+        SIZE
 
     };
 
@@ -30,14 +31,13 @@ public class KeyCombos : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-       
+        //THIS IS CALLED AT THE BEGINING OF EVERY FRAME => IF SHORTCUT IS PRESSED WE GET THAT INFO FROM KeyDownHandling
+        //THEN AFTER ALL OTHER OBJECTS ARE UPDATED (NEXT FRAME) WE WILL, IF NEEDED, RESET STATE OF SPECIFIC SHORTCUT
+        HandleShortcutStateReset();
+
         KeyDownHandling();
         KeyUpHandling();
-
-        if (IsShortcutPressed(e_keyShortcut.REMOVE_LAST_CREATED)) { 
-            Debug.Log("hide gui");
-            ResetShortcutState(e_keyShortcut.REMOVE_LAST_CREATED);
-        }
+      
     }
 
 
@@ -108,6 +108,15 @@ public class KeyCombos : MonoBehaviour {
         if (_sc == e_keyShortcut.END_LINE && key_down[KeyCode.W])
             key_down[KeyCode.W] = false;
     }
+
+    void HandleShortcutStateReset() {
+        for (int i = 0; i < (int)e_keyShortcut.SIZE; ++i)
+            ResetShortcutState((e_keyShortcut)i);
+    }
+
+    
+
+
 
 
 

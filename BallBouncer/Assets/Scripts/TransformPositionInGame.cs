@@ -3,7 +3,7 @@ using System.Collections;
 
 public class TransformPositionInGame : MonoBehaviour
 {
-    public GameObject[] middleDragPointObjs;
+    GameObject[] middleDragPointObjs;
 
     public bool canBePositioned = false;
 
@@ -180,19 +180,15 @@ public class TransformPositionInGame : MonoBehaviour
     void HandleMoveByUnit() {
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.MOVE_FORWARD_BY_UNIT)) { 
             MoveOnLocalAxisByUnit(Vector3.right);
-            keyCombos.ResetShortcutState(KeyCombos.e_keyShortcut.MOVE_FORWARD_BY_UNIT);
         }
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.MOVE_BACKWARD_BY_UNIT)) { 
             MoveOnLocalAxisByUnit(Vector3.left);
-            keyCombos.ResetShortcutState(KeyCombos.e_keyShortcut.MOVE_BACKWARD_BY_UNIT);
         }
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.MOVE_UP_BY_UNIT)) { 
             MoveOnLocalAxisByUnit(Vector3.up);
-            keyCombos.ResetShortcutState(KeyCombos.e_keyShortcut.MOVE_UP_BY_UNIT);
         }
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.MOVE_DOWN_BY_UNIT)) { 
             MoveOnLocalAxisByUnit(Vector3.down);
-            keyCombos.ResetShortcutState(KeyCombos.e_keyShortcut.MOVE_DOWN_BY_UNIT);
         }
     }
 
