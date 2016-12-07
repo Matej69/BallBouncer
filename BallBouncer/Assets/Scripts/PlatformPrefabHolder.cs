@@ -29,9 +29,10 @@ public class PlatformPrefabHolder : MonoBehaviour {
         }    
         return null;
     }
-    //get shape from object
 
-    //get surface from object
+    //get prefab without arrows, arrow moving ability and moving ability ==> platform that are non-movable creates level
+
+    //get prefab without arrows
 
 
 }

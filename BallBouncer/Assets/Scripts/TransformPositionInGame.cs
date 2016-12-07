@@ -5,7 +5,7 @@ public class TransformPositionInGame : MonoBehaviour
 {
     GameObject[] middleDragPointObjs;
 
-    public bool canBePositioned = false;
+    //public bool canBePositioned = false;
 
     Vector2 objSize;
 
@@ -37,19 +37,18 @@ public class TransformPositionInGame : MonoBehaviour
     }
 
     void Start() {
-        InitChildDragPoints();
         posPointClicked = e_PosPointClicked.NONE;
         lastFrameinputPos = new Vector2(0, 0);  //not important        
         objSize = transform.GetComponent<SpriteRenderer>().bounds.size;
-        if (canBePositioned)
-            CreateArrows();
-        //HandlePositioning();
+
+        CreateArrows();
+        InitChildDragPoints();
     }
 
     void Update() {
-        if (!canBePositioned)
+        if (!isMovableByArrows && !isMovableByCenter)
             return;
-
+        
         inputPos = MyInput.s_myInput.GetInputPositionInWorld();
 
         if (Input.GetKeyUp(KeyCode.Mouse0)) {
@@ -67,8 +66,6 @@ public class TransformPositionInGame : MonoBehaviour
         //for middle point drag
         if(isMovableByCenter && (posPointClicked != e_PosPointClicked.X_AXIS && posPointClicked != e_PosPointClicked.Y_AXIS))
             HandleMiddlePointPositioning();
-
-
 
         lastFrameinputPos = inputPos;
     }
@@ -156,16 +153,9 @@ public class TransformPositionInGame : MonoBehaviour
     void HandleMiddlePointPositioning() {
         //if (!MyInput.s_myInput.GetInputDown() && !MyInput.s_myInput.GetInputHold())
         //    return;
-        
+
         //detect if we are holding one of child of object which means we can move object itself  
-        bool isInside = false;
-        foreach(GameObject dp in middleDragPointObjs) {
-            float dpRadius = dp.GetComponent<CircleCollider2D>().radius/2;
-            float distance = Mathf.Sqrt(Mathf.Pow(inputPos.x - dp.transform.position.x, 2) + Mathf.Pow(inputPos.y - dp.transform.position.y, 2));
-            if (distance < dpRadius)
-                isInside = true;
-        }
-                
+        bool isInside = IsTouchingAtLeastOneDragPoint();
 
         if (posPointClicked == e_PosPointClicked.OBJECT_ITSELF)
             MoveInWorldPosBy(inputPos - lastFrameinputPos);
@@ -175,6 +165,19 @@ public class TransformPositionInGame : MonoBehaviour
             posPointClicked = e_PosPointClicked.OBJECT_ITSELF;
 
     }
+
+    public bool IsTouchingAtLeastOneDragPoint() {
+        foreach(GameObject dp in middleDragPointObjs) {
+            float dpRadius = dp.GetComponent<CircleCollider2D>().bounds.extents.x;
+            float distance = Mathf.Sqrt(Mathf.Pow(inputPos.x - dp.transform.position.x, 2) + Mathf.Pow(inputPos.y - dp.transform.position.y, 2));
+            if (distance < dpRadius)
+                return true;
+        }
+        return false;
+    }
+
+
+
         
     //THIS STUFF WILL BE IN SOME MANNAGER CLASS
     void HandleMoveByUnit() {
@@ -202,7 +205,6 @@ public class TransformPositionInGame : MonoBehaviour
         middleDragPointObjs = new GameObject[numOfDragPoints];
         for (int i = 0; i < numOfDragPoints; ++i)
             middleDragPointObjs[i] = transform.GetChild(i).gameObject;
-        Debug.Log(numOfDragPoints);
     }
 
     
