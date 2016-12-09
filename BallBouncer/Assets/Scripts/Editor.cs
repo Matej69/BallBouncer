@@ -8,20 +8,25 @@ public class Editor : MonoBehaviour {
     enum e_mouseAction {
         PLACING_PLATFORM,
         SCENE_PLATFORM_ADJUSTABLE,
+        START_END_LINE_PLACEMENT,
         GUI_INTERACTION,
         SIZE
     }
     e_mouseAction mouseAction = e_mouseAction.PLACING_PLATFORM;
 
+    public GameObject startLinePrefab;
+    public GameObject endLinePrefab;
+
     GameObject ball;
-    GameObject cam;
+    GameObject cam;    
     GameObject start_line;
     GameObject finish_line;
 
-    List<GameObject> list_nonMovablePlatforms = new List<GameObject>(); 
+    List<GameObject> list_nonMovableObjects = new List<GameObject>(); 
     
     GameObject selectedObjToBePlaced;
     GameObject selectedObjOnScreen;
+    GameObject copyObjectHolder;
 
     public GameObject platOnMouseSpriteObj;
 
@@ -41,6 +46,7 @@ public class Editor : MonoBehaviour {
 
     public GameObject onSaveErrorText;
     public GameObject platNumText;
+    public GameObject actionModeText;
 
     public GameObject saveButton;
     
@@ -68,10 +74,14 @@ public class Editor : MonoBehaviour {
         HandleBallReset();
 
         HandleMouseActionChangeOnInput(); 
-        HandleRemoveLastCreatedPlat();
-        UpdatetPlatformNumText();
+        HandleRemoveLastCreatedPlat();        
+        HandleSelectedObjectDeletion();
+        HandleObjectCopyPaste();
 
-        if (mouseAction == e_mouseAction.PLACING_PLATFORM)
+        UpdatetPlatformNumText();
+        UpdateActionModeText();
+
+        if (mouseAction == e_mouseAction.PLACING_PLATFORM || mouseAction == e_mouseAction.START_END_LINE_PLACEMENT)
             HandleObjectPlacing();
         else
             platOnMouseSpriteObj.GetComponent<SpriteRenderer>().sprite = null;
@@ -80,6 +90,9 @@ public class Editor : MonoBehaviour {
             HandleScenePlatformAdjustment();
         else
             selectedObjOnScreen = null;
+
+        if(selectedObjOnScreen != null)
+            Debug.Log(selectedObjOnScreen.name);      
 
     }
 
@@ -91,10 +104,12 @@ public class Editor : MonoBehaviour {
         //if (MyInput.s_myInput.GetInputDown() &&)
         //    selectedObjOnScreen = null;
 
-        if (list_nonMovablePlatforms.Count == 0)
+        if (list_nonMovableObjects.Count == 0)
             return;
         //find if at least one drag point on at least one object is pressed, if it is that object becomes selected one
-        foreach(GameObject plat in list_nonMovablePlatforms) {
+        foreach(GameObject plat in list_nonMovableObjects) {
+            if (!plat.GetComponent<TransformPositionInGame>().areDragPointInitialised)
+                continue;
             bool isTouching = plat.GetComponent<TransformPositionInGame>().IsTouchingAtLeastOneDragPoint();
             plat.GetComponent<TransformPositionInGame>().isMovableByArrows = false;
             if (isTouching && MyInput.s_myInput.GetInputDown())
@@ -107,19 +122,32 @@ public class Editor : MonoBehaviour {
 
     }
 
-
-
-    void HandleObjectPlacing() {
-        UpdatePlatOnMousePosition();
-        ChangeSelectedObjOnScroll();
-        if (selectedObjToBePlaced != null && MyInput.s_myInput.GetInputDown())
-            PlaceSelectedPlatform();
-
+    //OBJECT PLACING::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    void ChangeObjMouseSprite(GameObject go) {
+        if(go != null)
+            platOnMouseSpriteObj.GetComponent<SpriteRenderer>().sprite = go.GetComponent<SpriteRenderer>().sprite;
     }
     void UpdatePlatOnMousePosition() {
         if (platOnMouseSpriteObj != null)
             platOnMouseSpriteObj.transform.position = MyInput.s_myInput.GetInputPositionInWorld();
     }
+    void HandleObjectPlacing() {
+        UpdatePlatOnMousePosition();
+        if (mouseAction == e_mouseAction.PLACING_PLATFORM)
+            ChangeSelectedObjOnScroll();
+        else if (mouseAction == e_mouseAction.START_END_LINE_PLACEMENT)  {
+            if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.START_LINE))
+                selectedObjToBePlaced = startLinePrefab;
+            if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.END_LINE))
+                selectedObjToBePlaced = endLinePrefab;
+        }
+        //change mouse sprite
+        if (selectedObjToBePlaced != null)
+            ChangeObjMouseSprite(selectedObjToBePlaced);
+        if (selectedObjToBePlaced != null && MyInput.s_myInput.GetInputDown())
+            PlaceSelectedPlatform();
+
+    }    
     void ChangeSelectedObjOnScroll() {
         GameObject[] prefabList = PlatformPrefabHolder.s_instance.platformPrefabs;
         //calculate current index, and what next index will be
@@ -143,24 +171,65 @@ public class Editor : MonoBehaviour {
             currentIndex = 0;
         
         selectedObjToBePlaced = PlatformPrefabHolder.s_instance.platformPrefabs[currentIndex];
-        platOnMouseSpriteObj.GetComponent<SpriteRenderer>().sprite = selectedObjToBePlaced.GetComponent<SpriteRenderer>().sprite;
+        ChangeObjMouseSprite(selectedObjOnScreen);
     }
     void PlaceSelectedPlatform() {
-            list_nonMovablePlatforms.Add( (GameObject)Instantiate(selectedObjToBePlaced, inputPosWorld, Quaternion.identity) );
+        list_nonMovableObjects.Add( (GameObject)Instantiate(selectedObjToBePlaced, inputPosWorld, Quaternion.identity) );
     }
 
     void HandleRemoveLastCreatedPlat() {
-        if (list_nonMovablePlatforms.Count == 0)
+        if (list_nonMovableObjects.Count == 0)
             return;
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.REMOVE_LAST_CREATED)) {
-            GameObject lastObj = list_nonMovablePlatforms[list_nonMovablePlatforms.Count - 1];
+            GameObject lastObj = list_nonMovableObjects[list_nonMovableObjects.Count - 1];
             Destroy(lastObj);
-            list_nonMovablePlatforms.Remove(lastObj);
+            list_nonMovableObjects.Remove(lastObj);
         }
     }
 
+    //COPY/PASTE OBJECT:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    void HandleObjectCopyPaste() {
+        if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.COPY_SELECTED_OBJECT))
+            CopyObject();
+        if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.PASTE_SELECTED_OBJECT))
+            PasteObject();
+
+    }
+    void CopyObject() {
+        if (selectedObjOnScreen == null)
+            return;
+        copyObjectHolder = selectedObjOnScreen;
+    }
+    void PasteObject() {
+        if (copyObjectHolder == null)
+            return;
+
+        Platform copyObjScript = copyObjectHolder.GetComponent<Platform>();
+        foreach (GameObject prefab in PlatformPrefabHolder.s_instance.platformPrefabs) {
+            Platform prefabScript = prefab.GetComponent<Platform>();            
+            if (prefabScript.platformShape == copyObjScript.platformShape && prefabScript.platformSurface == copyObjScript.platformSurface) {
+                GameObject newObj = (GameObject)Instantiate(prefab, selectedObjOnScreen.transform.position, Quaternion.identity);
+                list_nonMovableObjects.Add(newObj);
+            }
+        }
+        
+    }
 
 
+    //DELETE OBJECT:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    void HandleSelectedObjectDeletion() {
+        if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.DELETE_SELECTED_OBJECT)) 
+            DeleteSelectedObject();
+    }
+    void DeleteSelectedObject() {
+        if (selectedObjOnScreen == null)
+            return;
+        list_nonMovableObjects.Remove(selectedObjOnScreen);
+        Destroy(selectedObjOnScreen);
+    }
+
+
+    //BALL STUFF:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     void HandleBallReset() {
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.RESET_BALL))
             ResetBall();
@@ -178,7 +247,7 @@ public class Editor : MonoBehaviour {
 
 
 
-    //GUI STUFF************************
+    //GUI STUFF:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     void GUIVisibilityCheck() {
         Canvas canvasScr = canvas.GetComponent<Canvas>();
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.HIDE_GUI)) { 
@@ -190,7 +259,10 @@ public class Editor : MonoBehaviour {
     }
 
     void UpdatetPlatformNumText() {
-        platNumText.GetComponent<Text>().text = list_nonMovablePlatforms.Count.ToString();
+        platNumText.GetComponent<Text>().text = list_nonMovableObjects.Count.ToString();
+    }
+    void UpdateActionModeText() {
+        actionModeText.GetComponent<Text>().text = mouseAction.ToString();
     }
 
     void SetSaveButtonListener() {
@@ -213,6 +285,10 @@ public class Editor : MonoBehaviour {
             currentValue = 0;
         else if(currentValue < 0)
             currentValue = (int)e_mouseAction.SIZE - 1;
+
+        if ((e_mouseAction)currentValue == e_mouseAction.START_END_LINE_PLACEMENT) { 
+            selectedObjToBePlaced = null;
+        }
 
         mouseAction = (e_mouseAction)currentValue;
     }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class TransformPositionInGame : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class TransformPositionInGame : MonoBehaviour
     
     public bool isMovableByArrows = true;
     public bool isMovableByCenter = true;
+    [HideInInspector]
+    public bool areDragPointInitialised = false;
 
     float detectionRadius = 0.25f;
     Vector2 lastFrameinputPos;
@@ -63,7 +66,7 @@ public class TransformPositionInGame : MonoBehaviour
         else {
             SetArrowVisibility(false);
         }
-        //for middle point drag
+        //for middle point drag **************************************************************************************************************FOR NOW
         if(isMovableByCenter && (posPointClicked != e_PosPointClicked.X_AXIS && posPointClicked != e_PosPointClicked.Y_AXIS))
             HandleMiddlePointPositioning();
 
@@ -167,7 +170,9 @@ public class TransformPositionInGame : MonoBehaviour
     }
 
     public bool IsTouchingAtLeastOneDragPoint() {
-        foreach(GameObject dp in middleDragPointObjs) {
+        if (!areDragPointInitialised)
+            return false;
+        foreach (GameObject dp in middleDragPointObjs) {
             float dpRadius = dp.GetComponent<CircleCollider2D>().bounds.extents.x;
             float distance = Mathf.Sqrt(Mathf.Pow(inputPos.x - dp.transform.position.x, 2) + Mathf.Pow(inputPos.y - dp.transform.position.y, 2));
             if (distance < dpRadius)
@@ -205,6 +210,7 @@ public class TransformPositionInGame : MonoBehaviour
         middleDragPointObjs = new GameObject[numOfDragPoints];
         for (int i = 0; i < numOfDragPoints; ++i)
             middleDragPointObjs[i] = transform.GetChild(i).gameObject;
+        areDragPointInitialised = true;
     }
 
     

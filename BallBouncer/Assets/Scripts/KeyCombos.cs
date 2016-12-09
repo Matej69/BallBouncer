@@ -17,6 +17,9 @@ public class KeyCombos : MonoBehaviour {
         START_LINE,                 //Q
         END_LINE,                   //W
         CHANGE_MOUSE_INTERACTION,   //1
+        DELETE_SELECTED_OBJECT,     //DELETE
+        COPY_SELECTED_OBJECT,       //SPACE+C
+        PASTE_SELECTED_OBJECT,      //SPACE+V
         SIZE
     };
 
@@ -86,6 +89,12 @@ public class KeyCombos : MonoBehaviour {
             return true;
         if (_sc == e_keyShortcut.CHANGE_MOUSE_INTERACTION && key_down[KeyCode.Alpha1])
             return true;
+        if (_sc == e_keyShortcut.DELETE_SELECTED_OBJECT && key_down[KeyCode.Delete])
+            return true;
+        if (_sc == e_keyShortcut.COPY_SELECTED_OBJECT && key_down[KeyCode.Space] && key_down[KeyCode.C])
+            return true;
+        if (_sc == e_keyShortcut.PASTE_SELECTED_OBJECT && key_down[KeyCode.Space] && key_down[KeyCode.V])
+            return true;
         return false;
     }
     public void ResetShortcutState(e_keyShortcut _sc) {
@@ -111,6 +120,12 @@ public class KeyCombos : MonoBehaviour {
             key_down[KeyCode.W] = false;
         if (_sc == e_keyShortcut.CHANGE_MOUSE_INTERACTION && key_down[KeyCode.Alpha1])
             key_down[KeyCode.Alpha1] = false;
+        if (_sc == e_keyShortcut.DELETE_SELECTED_OBJECT && key_down[KeyCode.Delete])
+            key_down[KeyCode.Delete] = false;
+        if (_sc == e_keyShortcut.COPY_SELECTED_OBJECT && key_down[KeyCode.C])
+            key_down[KeyCode.C] = false;
+        if (_sc == e_keyShortcut.PASTE_SELECTED_OBJECT && key_down[KeyCode.V])
+            key_down[KeyCode.V] = false;
     }
 
     void HandleShortcutStateReset() {
