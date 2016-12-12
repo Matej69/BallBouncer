@@ -159,7 +159,7 @@ public class TransformPositionInGame : MonoBehaviour
 
         //detect if we are holding one of child of object which means we can move object itself  
         bool isInside = IsTouchingAtLeastOneDragPoint();
-
+        
         if (posPointClicked == e_PosPointClicked.OBJECT_ITSELF)
             MoveInWorldPosBy(inputPos - lastFrameinputPos);
 

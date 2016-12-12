@@ -12,7 +12,7 @@ public class Editor : MonoBehaviour {
         GUI_INTERACTION,
         SIZE
     }
-    e_mouseAction mouseAction = e_mouseAction.PLACING_PLATFORM;
+    e_mouseAction mouseAction = e_mouseAction.GUI_INTERACTION;
 
     public GameObject startLinePrefab;
     public GameObject endLinePrefab;
@@ -20,7 +20,7 @@ public class Editor : MonoBehaviour {
     GameObject ball;
     GameObject cam;    
     GameObject start_line;
-    GameObject finish_line;
+    GameObject end_line;
 
     List<GameObject> list_nonMovableObjects = new List<GameObject>(); 
     
@@ -36,10 +36,7 @@ public class Editor : MonoBehaviour {
     //GUI STUFF***
     public GameObject canvas;
 
-    public GameObject rectNumInput;
-    public GameObject circleNumInput;
-    public GameObject triangleNumInput;
-    public GameObject curveNumInput;
+    public List<GameObject> platInputInfos;
 
     public GameObject levelIDInput;
     public GameObject worldIDInput;
@@ -50,7 +47,6 @@ public class Editor : MonoBehaviour {
 
     public GameObject saveButton;
     
-    public GameObject selectedPlatImage;
     //***
 
     void Awake() {
@@ -78,7 +74,7 @@ public class Editor : MonoBehaviour {
         HandleSelectedObjectDeletion();
         HandleObjectCopyPaste();
 
-        UpdatetPlatformNumText();
+        UpdatePlatformNumText();
         UpdateActionModeText();
 
         if (mouseAction == e_mouseAction.PLACING_PLATFORM || mouseAction == e_mouseAction.START_END_LINE_PLACEMENT)
@@ -91,9 +87,8 @@ public class Editor : MonoBehaviour {
         else
             selectedObjOnScreen = null;
 
-        if(selectedObjOnScreen != null)
-            Debug.Log(selectedObjOnScreen.name);      
-
+        Debug.Log(transform.eulerAngles.z);
+                
     }
 
 
@@ -144,12 +139,14 @@ public class Editor : MonoBehaviour {
         //change mouse sprite
         if (selectedObjToBePlaced != null)
             ChangeObjMouseSprite(selectedObjToBePlaced);
+        //place object in world
         if (selectedObjToBePlaced != null && MyInput.s_myInput.GetInputDown())
             PlaceSelectedPlatform();
 
     }    
     void ChangeSelectedObjOnScroll() {
         GameObject[] prefabList = PlatformPrefabHolder.s_instance.platformPrefabs;
+        
         //calculate current index, and what next index will be
         int size = prefabList.Length;
         int currentIndex = 0;
@@ -159,6 +156,7 @@ public class Editor : MonoBehaviour {
                 break;
                 }
         }
+        
         //increment/decrement index
         if (Input.GetAxisRaw("Mouse ScrollWheel") == -1f)
             currentIndex--;
@@ -174,7 +172,13 @@ public class Editor : MonoBehaviour {
         ChangeObjMouseSprite(selectedObjOnScreen);
     }
     void PlaceSelectedPlatform() {
-        list_nonMovableObjects.Add( (GameObject)Instantiate(selectedObjToBePlaced, inputPosWorld, Quaternion.identity) );
+        GameObject newObj = (GameObject)Instantiate(selectedObjToBePlaced, inputPosWorld, Quaternion.identity);
+        list_nonMovableObjects.Add(newObj);
+        //add their refrence to specific gameObjects
+        if (selectedObjToBePlaced.name == "startLine")
+            start_line = newObj;
+        if (selectedObjToBePlaced.name == "endLine")
+            end_line = newObj;
     }
 
     void HandleRemoveLastCreatedPlat() {
@@ -245,9 +249,78 @@ public class Editor : MonoBehaviour {
     }
 
 
+    //GET ENVIRONMENT PLATFORM INFO FROM ALL INPUTS::::::::::::::::::::::::::::::::::::::::
+    List<PlatformMovableInfo> GetMovablePlatInfoFromInput() {
+        List<PlatformMovableInfo> platfInfo = new List<PlatformMovableInfo>();
+        foreach(GameObject platItem in platInputInfos) {
+            int shape = (int)platItem.GetComponent<Platform>().platformShape;
+            int surface = (int)platItem.GetComponent<Platform>().platformSurface;
+            int numOfPlats = 0;
+            //if input can be read as int set new int, if not just use 0
+            int.TryParse(platItem.GetComponent<Text>().text, out numOfPlats);
+            //if there are some platforms info to be read, read it (if there are 2, then 2 infos will be written in JSON even if it's same info)
+            if (numOfPlats > 0) {
+                for (int i = 0; i < numOfPlats; ++i)
+                    platfInfo.Add(new PlatformMovableInfo(shape, surface));
+            }
+        }
+        return platfInfo;
+    }
+
+    //GET MOVABLE PLATFORM INFO FROM ALL INPUTS:::::::::::::::::::::::::::::::::::::::::::::
+    List<PlatformEnvironmentInfo> GetEnvironmentPlatInfo() {
+        List<PlatformEnvironmentInfo> platInfo = new List<PlatformEnvironmentInfo>();
+        foreach(GameObject platItem in list_nonMovableObjects) {
+            //skip all non-platforms
+            if (platItem.GetComponent<Platform>() == null)
+                continue;
+            double posX = platItem.transform.position.x;
+            double posY = platItem.transform.position.y;
+            double rotZ = platItem.transform.eulerAngles.z;
+            int shape = (int)platItem.GetComponent<Platform>().platformShape;
+            int surface = (int)platItem.GetComponent<Platform>().platformSurface;
+            platInfo.Add(new PlatformEnvironmentInfo(posX, posY, rotZ, shape, surface));
+        }
+        return platInfo;
+    }
 
 
     //GUI STUFF:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    void SetSaveButtonListener() {
+        saveButton.GetComponent<Button>().onClick.AddListener(delegate {
+            int levelID = 0;
+            int categoryID = 0;
+            bool isLevelReadable= int.TryParse(levelIDInput.GetComponent<Text>().text, out levelID);
+            bool isCategoryReadable = int.TryParse(worldIDInput.GetComponent<Text>().text, out categoryID);
+            if (!isLevelReadable || !isCategoryReadable) {
+                onSaveErrorText.GetComponent<Text>().text = "ERROR ON CATEGORY/LEVEL INPUT";
+                return;
+            }
+            //Check if level or world already exists and give proper message
+            if (LevelDesignInfo.DoesLevelDesignExists(categoryID, levelID)) { 
+                onSaveErrorText.GetComponent<Text>().text = "ALREADY EXISTS";
+                return;
+            }
+            else if(start_line == null || end_line == null) {
+                onSaveErrorText.GetComponent<Text>().text = "START OR END LINE MISSING";
+                return;
+            }
+            else
+                onSaveErrorText.GetComponent<Text>().text = "SUSCESSFULLY CHECKED";
+            //set-up all info that will be written in JSON file and save it
+            List<PlatformMovableInfo> movableInfo = GetMovablePlatInfoFromInput();
+            List<PlatformEnvironmentInfo> environmentInfo = GetEnvironmentPlatInfo();
+            double startX = start_line.transform.position.x;
+            double startY = start_line.transform.position.y;
+            double endX = end_line.transform.position.x;
+            double endY = end_line.transform.position.y;
+            //apply info to object that is used for JSON and save it
+            LevelDesignInfo levelDesign = new LevelDesignInfo(categoryID, levelID, startX, startY, endX, endY, environmentInfo, movableInfo);
+            LevelDesignInfo.SaveLevelDesign(levelDesign);
+        });
+    }
+
     void GUIVisibilityCheck() {
         Canvas canvasScr = canvas.GetComponent<Canvas>();
         if (keyCombos.IsShortcutPressed(KeyCombos.e_keyShortcut.HIDE_GUI)) { 
@@ -258,20 +331,11 @@ public class Editor : MonoBehaviour {
             }
     }
 
-    void UpdatetPlatformNumText() {
+    void UpdatePlatformNumText() {
         platNumText.GetComponent<Text>().text = list_nonMovableObjects.Count.ToString();
     }
     void UpdateActionModeText() {
         actionModeText.GetComponent<Text>().text = mouseAction.ToString();
-    }
-
-    void SetSaveButtonListener() {
-        saveButton.GetComponent<Button>().onClick.AddListener(delegate {
-            //load info about level in some class
-            //Check if level or world already exists
-            //--->if exists, change errorText = Already exists
-            //--->if not, save level as new to JSON
-        });
     }
 
     void HandleMouseActionChangeOnInput() {
@@ -287,7 +351,8 @@ public class Editor : MonoBehaviour {
             currentValue = (int)e_mouseAction.SIZE - 1;
 
         if ((e_mouseAction)currentValue == e_mouseAction.START_END_LINE_PLACEMENT) { 
-            selectedObjToBePlaced = null;
+            selectedObjToBePlaced = startLinePrefab;
+            ChangeObjMouseSprite(startLinePrefab);
         }
 
         mouseAction = (e_mouseAction)currentValue;

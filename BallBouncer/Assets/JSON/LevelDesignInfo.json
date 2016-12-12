@@ -1,0 +1,139 @@
+[{
+	"categoryID": 2,
+	"levelID": 2,
+	"startX": 1.0,
+	"startY": 2.0,
+	"endX": 3.0,
+	"endY": 4.0,
+	"platMovableInfos": [{
+		"shape": 1,
+		"surface": 2
+	}, {
+		"shape": 3,
+		"surface": 4
+	}],
+	"platEnvironmentInfos": [{
+		"posX": 1.234,
+		"posY": 2.234,
+		"rotZ": 60.05,
+		"shape": 5,
+		"surface": 6
+	}, {
+		"posX": 3.234,
+		"posY": 4.234,
+		"rotZ": 160.05,
+		"shape": 7,
+		"surface": 8
+	}]
+}, {
+	"categoryID": 5,
+	"levelID": 5,
+	"startX": 123.456,
+	"startY": 456.789,
+	"endX": 122.6788909,
+	"endY": 907.1221,
+	"platMovableInfos": [{
+		"shape": 1,
+		"surface": 2
+	}, {
+		"shape": 3,
+		"surface": 4
+	}],
+	"platEnvironmentInfos": [{
+		"posX": 22.234,
+		"posY": 33.234,
+		"rotZ": 44.05,
+		"shape": 2,
+		"surface": 1
+	}, {
+		"posX": 55.234,
+		"posY": 66.234,
+		"rotZ": 777.05,
+		"shape": 4,
+		"surface": 3
+	}]
+}, {
+	"categoryID": 5,
+	"levelID": 5,
+	"startX": 123.456,
+	"startY": 456.789,
+	"endX": 122.6788909,
+	"endY": 907.1221,
+	"platMovableInfos": [{
+		"shape": 1,
+		"surface": 2
+	}, {
+		"shape": 3,
+		"surface": 4
+	}],
+	"platEnvironmentInfos": [{
+		"posX": 22.234,
+		"posY": 33.234,
+		"rotZ": 44.05,
+		"shape": 2,
+		"surface": 1
+	}, {
+		"posX": 55.234,
+		"posY": 66.234,
+		"rotZ": 777.05,
+		"shape": 4,
+		"surface": 3
+	}]
+}, {
+	"categoryID": 1,
+	"levelID": 1,
+	"startX": -2.38714289665222,
+	"startY": 3.33174586296082,
+	"endX": -1.07920634746552,
+	"endY": 2.10000014305115,
+	"platMovableInfos": [],
+	"platEnvironmentInfos": [{
+		"posX": 0.800158619880676,
+		"posY": -1.73492074012756,
+		"rotZ": 0.0,
+		"shape": 1,
+		"surface": 2
+	}]
+}, {
+	"categoryID": 7,
+	"levelID": 7,
+	"startX": -1.73952376842499,
+	"startY": 1.70634913444519,
+	"endX": 0.0636509656906128,
+	"endY": 0.512698411941528,
+	"platMovableInfos": [{
+		"shape": 0,
+		"surface": 0
+	}, {
+		"shape": 0,
+		"surface": 0
+	}, {
+		"shape": 2,
+		"surface": 2
+	}, {
+		"shape": 1,
+		"surface": 1
+	}, {
+		"shape": 1,
+		"surface": 1
+	}],
+	"platEnvironmentInfos": [{
+		"posX": -1.43476188182831,
+		"posY": 3.49682545661926,
+		"rotZ": 0.0,
+		"shape": 2,
+		"surface": 1
+	}, {
+		"posX": 0.0636509656906128,
+		"posY": 3.50952363014221,
+		"rotZ": 0.0,
+		"shape": 2,
+		"surface": 1
+	}, {
+		"posX": -2.8696825504303,
+		"posY": 0.373015880584717,
+		"rotZ": 43.0577621459961,
+		"shape": 0,
+		"surface": 0
+	}]
+}]
