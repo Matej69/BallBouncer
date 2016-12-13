@@ -17,22 +17,30 @@ public class TransformRotationInGame : MonoBehaviour {
 
     float detectionRadius;
 
-    bool isRotPointClicked = false;    
+    bool isRotPointClicked = false;
+    
+    void Awake() {
+        //this might be a problem since when object with this class is created somewhere we can access sprite renderer on rot points without creating points first
+        CreateRotationPoints();
+    }    
 
     // Use this for initialization
     void Start () {
         inputPos = new Vector2(0, 0); //initial values
-        if (canBeRotated) { 
-            CreateRotationPoints();
+        //if (canBeRotated) {             
             detectionRadius = rotPoints[0].transform.GetComponent<SpriteRenderer>().bounds.size.x/2;
-            }
+        //    }
 
     }
     
     // Update is called once per frame
     void Update () {
-        if (!canBeRotated)
+        if (!canBeRotated) {
+            SetRotationPointsVisibility(false);
             return;
+        }
+        else
+            SetRotationPointsVisibility(true);
 
         inputPos = MyInput.s_myInput.GetInputPositionInWorld();
         if (MyInput.s_myInput.GetInputUp()) {
@@ -95,9 +103,25 @@ public class TransformRotationInGame : MonoBehaviour {
         transform.Rotate(new Vector3(0, 0, angle));
     }
 
+
+    void SetRotationPointsVisibility(bool state) {
+        foreach(GameObject rotPoint in rotPoints) {
+            rotPoint.GetComponent<SpriteRenderer>().enabled = state;
+        }
+    }
+
     
 
-
+    //SET ALL OBJECT PROPERTIES TO ONES FOR ENVIRONMENT OBJECT
+    public void SetEnvironmentObjectSettings() {
+        canBeRotated = false;
+        SetRotationPointsVisibility(false);
+    }
+    //SET ALL OBJECT PROPERTIES TO ONES FOR MOVABLE OBJECT
+    public void SetMovableObjectSettings() {
+        canBeRotated = true;
+        SetRotationPointsVisibility(true);
+    }
 
 
 }

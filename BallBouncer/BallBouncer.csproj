@@ -70,10 +70,11 @@
     <Compile Include="Assets\Scripts\Editor.cs" />
     <Compile Include="Assets\Scripts\KeyCombos.cs" />
     <Compile Include="Assets\Scripts\LevelDesignInfo.cs" />
+    <Compile Include="Assets\Scripts\LevelObjectsPrefabHolder.cs" />
+    <Compile Include="Assets\Scripts\LevelScene.cs" />
     <Compile Include="Assets\Scripts\MyInput.cs" />
     <Compile Include="Assets\Scripts\Platform.cs" />
     <Compile Include="Assets\Scripts\PlatformInfo.cs" />
-    <Compile Include="Assets\Scripts\PlatformPrefabHolder.cs" />
     <Compile Include="Assets\Scripts\TransformPositionInGame.cs" />
     <Compile Include="Assets\Scripts\TransformRotationInGame.cs" />
   </ItemGroup>

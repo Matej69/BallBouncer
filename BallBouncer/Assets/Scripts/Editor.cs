@@ -145,7 +145,7 @@ public class Editor : MonoBehaviour {
 
     }    
     void ChangeSelectedObjOnScroll() {
-        GameObject[] prefabList = PlatformPrefabHolder.s_instance.platformPrefabs;
+        GameObject[] prefabList = LevelObjectsPrefabHolder.s_instance.platformPrefabs;
         
         //calculate current index, and what next index will be
         int size = prefabList.Length;
@@ -168,7 +168,7 @@ public class Editor : MonoBehaviour {
         else if ((currentIndex > size - 1))
             currentIndex = 0;
         
-        selectedObjToBePlaced = PlatformPrefabHolder.s_instance.platformPrefabs[currentIndex];
+        selectedObjToBePlaced = LevelObjectsPrefabHolder.s_instance.platformPrefabs[currentIndex];
         ChangeObjMouseSprite(selectedObjOnScreen);
     }
     void PlaceSelectedPlatform() {
@@ -209,7 +209,7 @@ public class Editor : MonoBehaviour {
             return;
 
         Platform copyObjScript = copyObjectHolder.GetComponent<Platform>();
-        foreach (GameObject prefab in PlatformPrefabHolder.s_instance.platformPrefabs) {
+        foreach (GameObject prefab in LevelObjectsPrefabHolder.s_instance.platformPrefabs) {
             Platform prefabScript = prefab.GetComponent<Platform>();            
             if (prefabScript.platformShape == copyObjScript.platformShape && prefabScript.platformSurface == copyObjScript.platformSurface) {
                 GameObject newObj = (GameObject)Instantiate(prefab, selectedObjOnScreen.transform.position, Quaternion.identity);

@@ -37,6 +37,10 @@ public class TransformPositionInGame : MonoBehaviour
 
     void Awake() {
         keyCombos = GameObject.Find("KeyShortcuts").GetComponent<KeyCombos>();
+
+        //this might be a problem since when object with this class is created somewhere we can access sprite rendere on arrows without creating arrows first
+        CreateArrows();
+        InitChildDragPoints();
     }
 
     void Start() {
@@ -44,8 +48,7 @@ public class TransformPositionInGame : MonoBehaviour
         lastFrameinputPos = new Vector2(0, 0);  //not important        
         objSize = transform.GetComponent<SpriteRenderer>().bounds.size;
 
-        CreateArrows();
-        InitChildDragPoints();
+        
     }
 
     void Update() {
@@ -211,6 +214,22 @@ public class TransformPositionInGame : MonoBehaviour
         for (int i = 0; i < numOfDragPoints; ++i)
             middleDragPointObjs[i] = transform.GetChild(i).gameObject;
         areDragPointInitialised = true;
+    }
+
+
+
+
+    //SET ALL OBJECT PROPERTIES TO ONES FOR ENVIRONMENT OBJECT
+    public void SetEnvironmentObjectSettings() {
+        isMovableByCenter = false;
+        isMovableByArrows = false;
+        SetArrowVisibility(false);
+    }
+    //SET ALL OBJECT PROPERTIES TO ONES FOR MOVABLE OBJECT
+    public void SetMovableObjectSettings() {
+        isMovableByCenter = true;
+        isMovableByArrows = false;
+        SetArrowVisibility(false);
     }
 
     
