@@ -35,10 +35,15 @@ public class LevelDesignInfo {
         platMovableInfos = _movePlats;
         platEnvironmentInfos = _envPlats;
     }
+
+    public static string GetJSONFileString() {
+        string jsonFilePath = Resources.Load<TextAsset>("JSON/LevelDesignInfo").text;
+        return jsonFilePath;
+    } 
     
     public static bool DoesLevelDesignExists(int _category, int _level) {
         //first load all data
-        string jsonString = File.ReadAllText(Application.dataPath + "/JSON/LevelDesignInfo.json");
+        string jsonString = GetJSONFileString();
         JsonData jsonData = JsonMapper.ToObject(jsonString);
         //if exists with given category and level then return true
         for(int i = 0; i < jsonData.Count; ++i) {
@@ -52,7 +57,7 @@ public class LevelDesignInfo {
 
     public static void SaveLevelDesign(LevelDesignInfo _levelDesign) {
         //first load all data
-        string jsonString = File.ReadAllText(Application.dataPath + "/JSON/LevelDesignInfo.json");
+        string jsonString = GetJSONFileString();
         JsonData jsonDataOld = JsonMapper.ToObject(jsonString);
         //load all into list
         List<LevelDesignInfo> list_levelDesign = new List<LevelDesignInfo>();
@@ -70,7 +75,7 @@ public class LevelDesignInfo {
 
     public static void RemoveLevelDesign(int _category, int _level) {
         //first load all data
-        string jsonString = File.ReadAllText(Application.dataPath + "/JSON/LevelDesignInfo.json");
+        string jsonString = GetJSONFileString();
         JsonData jsonData = JsonMapper.ToObject(jsonString);
         //load all into list except levelDesign with specific categoryID and levelID
         List<LevelDesignInfo> list_levelDesign = new List<LevelDesignInfo>();
@@ -88,7 +93,7 @@ public class LevelDesignInfo {
 
     public static LevelDesignInfo LoadLevelDesign(int _category, int _level) {
         //read all from json
-        string jsonString = File.ReadAllText(Application.dataPath + "/JSON/LevelDesignInfo.json");
+        string jsonString = GetJSONFileString();
         JsonData jsonData = JsonMapper.ToObject(jsonString);
         //create level by reading values from json ony for given categoryID and levelID
         LevelDesignInfo levelDesign = new LevelDesignInfo();

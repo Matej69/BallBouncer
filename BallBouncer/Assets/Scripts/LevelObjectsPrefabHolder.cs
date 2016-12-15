@@ -11,31 +11,35 @@ public class LevelObjectsPrefabHolder : MonoBehaviour {
     public GameObject endLinePrefab;
     public GameObject ballPrefab;
 
+    public GameObject explosionPrefab;
+    public GameObject boxPrefab;
+    public GameObject explosiveBox;
+
 
     void Awake() {
         s_instance = this;
     }
-    
 
-	void Start () {
+
+    void Start() {
 
     }
-    	
-	// Update is called once per frame
-	void Update () {	
-	}
+
+    // Update is called once per frame
+    void Update() {
+    }
 
 
     //get prefab from shape&surface
-    public GameObject GetPlatformPrefab(Platform.e_platformShape _shape, Platform.e_platformSurface _surface) { 
-        foreach(GameObject prefab in platformPrefabs) {
-            Platform platformScr = prefab.GetComponent<Platform>();            
-            if (platformScr.platformShape == _shape && platformScr.platformSurface == _surface) {                
+    public GameObject GetPlatformPrefab(Platform.e_platformShape _shape, Platform.e_platformSurface _surface) {
+        foreach (GameObject prefab in platformPrefabs) {
+            Platform platformScr = prefab.GetComponent<Platform>();
+            if (platformScr.platformShape == _shape && platformScr.platformSurface == _surface) {
                 return prefab;
             }
         }
         //Debug.Log(platformScr.platformShape + " = " + _shape + " --- " + platformScr.platformSurface + " = " + _surface);
-        Debug.Log(_shape+" "+_surface);
+        Debug.Log(_shape + " " + _surface);
         return null;
     }
 
@@ -50,6 +54,18 @@ public class LevelObjectsPrefabHolder : MonoBehaviour {
     public GameObject GetBallPrefab() {
         return ballPrefab;
     }
+
+
+    public GameObject GetExplosiveBoxPrefab() {
+        return explosiveBox;
+    }
+    public GameObject GetBoxPrefab() {
+        return boxPrefab;
+    }
+    public GameObject GetExplosionPrefab() {
+        return explosionPrefab; 
+    }
+
 
 
 }

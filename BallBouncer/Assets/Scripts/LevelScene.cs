@@ -13,19 +13,32 @@ public class LevelScene : MonoBehaviour {
     GameObject endLine;
     GameObject ball;
 
+    GameObject box;
+    bool areMovablePlatSpawned = false;    
+
     // Use this for initialization
     void Start () {
 
+        CreateBox();
+
         InitLevel(7,7);
         CreateBall();   //must go after InitLevel()
-
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
 
         HandleBallReset();
+        HandleMovablePlatformsLoad();
 
+    }
+
+
+
+    void CreateBox() {
+        Vector2 boxSpawnPoint = new Vector2(Camera.main.transform.position.x, Camera.main.transform.position.y - 3f);
+        box = (GameObject)Instantiate(LevelObjectsPrefabHolder.s_instance.GetExplosiveBoxPrefab(), boxSpawnPoint, Quaternion.identity);
     }
 
     void InitLevel(int _category, int _level) {
@@ -52,19 +65,7 @@ public class LevelScene : MonoBehaviour {
 
             platformInstance.transform.eulerAngles = new Vector3(0, 0, (float)platInfo.rotZ);
             list_environmentPlatforms.Add(platformInstance);
-        }    
-            
-        //set movable platforms -> needs to create box and after box animation platform will appear
-        foreach(PlatformMovableInfo platInfo in levelDesign.platMovableInfos) {
-            Platform.e_platformShape shape = (Platform.e_platformShape)platInfo.shape;
-            Platform.e_platformSurface surface = (Platform.e_platformSurface)platInfo.surface;
-            GameObject platformPrefab = LevelObjectsPrefabHolder.s_instance.GetPlatformPrefab(shape, surface);
-            GameObject platformInstance = (GameObject)Instantiate(platformPrefab, new Vector2(6,6), Quaternion.identity);
-
-            platformInstance.GetComponent<TransformPositionInGame>().SetMovableObjectSettings();
-            platformInstance.GetComponent<TransformRotationInGame>().SetMovableObjectSettings();
-            list_movablePlatforms.Add(platformInstance);
-        }        
+        }
         
         //start/end line
         Vector2 startLinePos = new Vector2((float)levelDesign.startX, (float)levelDesign.startY);
@@ -74,6 +75,50 @@ public class LevelScene : MonoBehaviour {
         startLine.GetComponent<TransformPositionInGame>().SetEnvironmentObjectSettings();
         endLine.GetComponent<TransformPositionInGame>().SetEnvironmentObjectSettings();
     }
+
+
+
+    void HandleMovablePlatformsLoad() {
+        if ( !areMovablePlatSpawned && box.GetComponent<BoxWithPlatforms>().readyToSpawnPlatforms) { 
+            LoadMovablePlatforms(category, level);
+            areMovablePlatSpawned = true;
+            }
+    }
+    void LoadMovablePlatforms(int _category, int _level) {
+        LevelDesignInfo levelDesign = LevelDesignInfo.LoadLevelDesign(_category, _level);
+
+        float distanceBtwObjects = 0.07f;
+        float xSpaceTaken = 0;
+        //calculate x length that all movable objects will take + distance between every one
+        foreach(PlatformMovableInfo platInfo in levelDesign.platMovableInfos) {
+            Platform.e_platformShape shape = (Platform.e_platformShape)platInfo.shape;
+            Platform.e_platformSurface surface = (Platform.e_platformSurface)platInfo.surface;
+            float objLength = LevelObjectsPrefabHolder.s_instance.GetPlatformPrefab(shape, surface).GetComponent<SpriteRenderer>().bounds.size.x;
+            xSpaceTaken += objLength + distanceBtwObjects;
+        }
+
+        Vector2 spawnPoint = new Vector2(box.transform.position.x - xSpaceTaken/2, box.transform.position.y);
+        float prevObjWidth = 0f;
+        //create movable platforms
+        foreach (PlatformMovableInfo platInfo in levelDesign.platMovableInfos)
+        {
+            Platform.e_platformShape shape = (Platform.e_platformShape)platInfo.shape;
+            Platform.e_platformSurface surface = (Platform.e_platformSurface)platInfo.surface;
+            GameObject platformPrefab = LevelObjectsPrefabHolder.s_instance.GetPlatformPrefab(shape, surface);
+
+            float thisObjectWidth = platformPrefab.GetComponent<SpriteRenderer>().bounds.size.x;
+            spawnPoint = new Vector2(spawnPoint.x + thisObjectWidth/2 + prevObjWidth/2 + distanceBtwObjects, spawnPoint.y);
+            GameObject platformInstance = (GameObject)Instantiate(platformPrefab, spawnPoint, Quaternion.identity);
+            prevObjWidth = platformPrefab.GetComponent<SpriteRenderer>().bounds.size.x;
+
+            platformInstance.GetComponent<TransformPositionInGame>().SetMovableObjectSettings();
+            platformInstance.GetComponent<TransformRotationInGame>().SetMovableObjectSettings();
+            list_movablePlatforms.Add(platformInstance);
+        }
+    }
+
+
+
 
     void CreateBall() {
         ball = (GameObject)Instantiate(LevelObjectsPrefabHolder.s_instance.GetBallPrefab());

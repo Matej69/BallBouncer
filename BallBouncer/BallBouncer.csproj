@@ -62,10 +62,11 @@
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="LitJson">
-      <HintPath>Assets\JSON\LitJson.dll</HintPath>
+      <HintPath>Assets\Resources\JSON\LitJson.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\BoxWithPlatforms.cs" />
     <Compile Include="Assets\Scripts\CameraRatio.cs" />
     <Compile Include="Assets\Scripts\Editor.cs" />
     <Compile Include="Assets\Scripts\KeyCombos.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Assets\Scripts\MyInput.cs" />
     <Compile Include="Assets\Scripts\Platform.cs" />
     <Compile Include="Assets\Scripts\PlatformInfo.cs" />
+    <Compile Include="Assets\Scripts\Timer.cs" />
     <Compile Include="Assets\Scripts\TransformPositionInGame.cs" />
     <Compile Include="Assets\Scripts\TransformRotationInGame.cs" />
   </ItemGroup>

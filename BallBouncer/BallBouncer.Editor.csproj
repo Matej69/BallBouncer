@@ -92,7 +92,7 @@
       <HintPath>Library\UnityAssemblies\SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="LitJson">
-      <HintPath>Assets\JSON\LitJson.dll</HintPath>
+      <HintPath>Assets\Resources\JSON\LitJson.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
