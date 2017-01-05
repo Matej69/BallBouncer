@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class LevelScene : MonoBehaviour {
 
-    int category;
-    int level;
+    public int category;
+    public int level;
 
     List<GameObject> list_environmentPlatforms = new List<GameObject>();
     List<GameObject> list_movablePlatforms = new List<GameObject>();
@@ -14,20 +14,23 @@ public class LevelScene : MonoBehaviour {
     GameObject ball;
 
     GameObject box;
-    bool areMovablePlatSpawned = false;    
+    bool areMovablePlatSpawned = false;
+    bool isLevelFinished = false;  
 
     // Use this for initialization
     void Start () {
+        category = PlayerPrefs.GetInt("worldToLoad");
+        level = PlayerPrefs.GetInt("levelToLoad");
 
-        CreateBox();
-
-        InitLevel(7,7);
+        CreateBox();        
+        InitLevel(category, level);
         CreateBall();   //must go after InitLevel()
         
     }
 	
 	// Update is called once per frame
 	void Update () {
+        HandleLevelDoneState();
 
         HandleBallReset();
         HandleMovablePlatformsLoad();
@@ -69,7 +72,7 @@ public class LevelScene : MonoBehaviour {
         
         //start/end line
         Vector2 startLinePos = new Vector2((float)levelDesign.startX, (float)levelDesign.startY);
-        Vector2 endLinePos = new Vector2((float)levelDesign.endX, (float)levelDesign.endX);
+        Vector2 endLinePos = new Vector2((float)levelDesign.endX, (float)levelDesign.endY);
         startLine = (GameObject)Instantiate(LevelObjectsPrefabHolder.s_instance.GetStartLinePrefab(), startLinePos, Quaternion.identity);
         endLine = (GameObject)Instantiate(LevelObjectsPrefabHolder.s_instance.GetEndLinePrefab(), endLinePos, Quaternion.identity);
         startLine.GetComponent<TransformPositionInGame>().SetEnvironmentObjectSettings();
@@ -86,6 +89,8 @@ public class LevelScene : MonoBehaviour {
     }
     void LoadMovablePlatforms(int _category, int _level) {
         LevelDesignInfo levelDesign = LevelDesignInfo.LoadLevelDesign(_category, _level);
+        if (levelDesign == null || levelDesign.platEnvironmentInfos == null || levelDesign.platMovableInfos == null)
+            return;
 
         float distanceBtwObjects = 0.07f;
         float xSpaceTaken = 0;
@@ -122,7 +127,8 @@ public class LevelScene : MonoBehaviour {
 
     void CreateBall() {
         ball = (GameObject)Instantiate(LevelObjectsPrefabHolder.s_instance.GetBallPrefab());
-        ball.transform.position = startLine.transform.position;
+        if(startLine != null)
+            ball.transform.position = startLine.transform.position;
     }
 
 
@@ -141,6 +147,34 @@ public class LevelScene : MonoBehaviour {
         ball.transform.position = startLine.transform.position;
         ball.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
     }
+
+
+
+    bool IsBallTouchingFinish() {
+        if (ball == null || endLine == null)
+            return false;
+
+        GameObject[] endLineColl = endLine.GetComponent<TransformPositionInGame>().middleDragPointObjs;
+        Vector2 ballPos = ball.transform.position;
+        float ballRad = ball.GetComponent<CircleCollider2D>().radius;
+
+        foreach (GameObject collObj in endLineColl) {
+            float finishColRad = collObj.GetComponent<CircleCollider2D>().radius;
+            Vector2 finishColPos = collObj.GetComponent<CircleCollider2D>().bounds.center;
+
+            float distance = Vector2.Distance(finishColPos, ballPos);
+            if (distance < ballRad + finishColRad) 
+                return true;            
+        }
+        return false;
+    }
+
+    void HandleLevelDoneState() {
+        if (IsBallTouchingFinish())
+            isLevelFinished = true;
+    }
+
+    
 
 
 

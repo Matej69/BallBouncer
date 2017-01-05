@@ -4,7 +4,8 @@ using System;
 
 public class TransformPositionInGame : MonoBehaviour
 {
-    GameObject[] middleDragPointObjs;
+    [HideInInspector]
+    public GameObject[] middleDragPointObjs;
 
     //public bool canBePositioned = false;
 

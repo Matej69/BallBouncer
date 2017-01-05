@@ -2,16 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/*
-public class MovablePlatformQuantityInfo {
-    List<PlatformMovableInfo> movablePlatforms;
-    /*void Init(int _normal, int _circle, int _triangle, int _curve) {
-        normal = _normal;
-        circle = _circle;
-    }
-         
-}
-*/
 public class PlatformMovableInfo  {
     public int shape;
     public int surface;

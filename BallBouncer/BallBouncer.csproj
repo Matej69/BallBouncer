@@ -68,14 +68,18 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\BoxWithPlatforms.cs" />
     <Compile Include="Assets\Scripts\CameraRatio.cs" />
+    <Compile Include="Assets\Scripts\ChooseLevelScript.cs" />
     <Compile Include="Assets\Scripts\Editor.cs" />
     <Compile Include="Assets\Scripts\KeyCombos.cs" />
     <Compile Include="Assets\Scripts\LevelDesignInfo.cs" />
     <Compile Include="Assets\Scripts\LevelObjectsPrefabHolder.cs" />
     <Compile Include="Assets\Scripts\LevelScene.cs" />
+    <Compile Include="Assets\Scripts\MainMenu.cs" />
     <Compile Include="Assets\Scripts\MyInput.cs" />
     <Compile Include="Assets\Scripts\Platform.cs" />
     <Compile Include="Assets\Scripts\PlatformInfo.cs" />
+    <Compile Include="Assets\Scripts\ScreenPrefabHolder.cs" />
+    <Compile Include="Assets\Scripts\SoundManager.cs" />
     <Compile Include="Assets\Scripts\Timer.cs" />
     <Compile Include="Assets\Scripts\TransformPositionInGame.cs" />
     <Compile Include="Assets\Scripts\TransformRotationInGame.cs" />

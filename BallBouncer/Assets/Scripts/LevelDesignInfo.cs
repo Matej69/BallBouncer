@@ -4,20 +4,23 @@ using LitJson;
 using System.IO;
 using System.Collections.Generic;
 
-public class LevelDesignInfo {
+
+public class LevelDesignInfo {    
     public int categoryID, levelID;
+    public double time;                 //777 will be value that will represent NULL
     public double startX, startY;
     public double endX, endY;
     public List<PlatformMovableInfo> platMovableInfos;
     public List<PlatformEnvironmentInfo> platEnvironmentInfos;
 
     public LevelDesignInfo() { }
-    public LevelDesignInfo(int _categoryID, int _levelID, 
+    public LevelDesignInfo(int _categoryID, int _levelID, double _time,
                            double _startX, double _startY, double _endX, double _endY, 
                            List<PlatformEnvironmentInfo> _envPlats, 
                            List<PlatformMovableInfo> _movePlats) {
         categoryID = _categoryID;
         levelID = _levelID;
+        time = _time;
         startX = _startX;
         startY = _startY;
         endX = _endX;
@@ -25,9 +28,10 @@ public class LevelDesignInfo {
         platMovableInfos = _movePlats;
         platEnvironmentInfos = _envPlats;
     }
-    public void Init(int _categoryID, int _levelID,double _startX, double _startY, double _endX, double _endY, List<PlatformEnvironmentInfo> _envPlats, List<PlatformMovableInfo> _movePlats) {
+    public void Init(int _categoryID, int _levelID, double _time, double _startX, double _startY, double _endX, double _endY, List<PlatformEnvironmentInfo> _envPlats, List<PlatformMovableInfo> _movePlats) {
         categoryID = _categoryID;
         levelID = _levelID;
+        time = _time;
         startX = _startX;
         startY = _startY;
         endX = _endX;
@@ -70,7 +74,7 @@ public class LevelDesignInfo {
         list_levelDesign.Add(_levelDesign);
         //save with new at the end
         JsonData jsonDataNew = JsonMapper.ToJson(list_levelDesign);
-        File.WriteAllText(Application.dataPath + "/JSON/LevelDesignInfo.json",jsonDataNew.ToString());
+        File.WriteAllText(Application.dataPath + "/Resources/JSON/LevelDesignInfo.json", jsonDataNew.ToString());
     }
 
     public static void RemoveLevelDesign(int _category, int _level) {
@@ -88,7 +92,7 @@ public class LevelDesignInfo {
 
         //save with new at the end
         JsonData jsonDataNew = JsonMapper.ToJson(list_levelDesign);
-        File.WriteAllText(Application.dataPath + "/JSON/LevelDesignInfo.json", jsonDataNew.ToString());
+        File.WriteAllText(Application.dataPath + "/Resources/JSON/LevelDesignInfo.json", jsonDataNew.ToString());
     }
 
     public static LevelDesignInfo LoadLevelDesign(int _category, int _level) {
@@ -100,6 +104,7 @@ public class LevelDesignInfo {
         for (int i = 0; i < jsonData.Count; ++i) {
             if (int.Parse(jsonData[i]["categoryID"].ToString()) == _category && int.Parse(jsonData[i]["levelID"].ToString()) == _level)
             {
+                double time = double.Parse(jsonData[i]["time"].ToString());
                 double startX = double.Parse(jsonData[i]["startX"].ToString());
                 double startY = double.Parse(jsonData[i]["startY"].ToString());
                 double endX = double.Parse(jsonData[i]["endX"].ToString());
@@ -122,7 +127,7 @@ public class LevelDesignInfo {
                     platformMovable.Add(new PlatformMovableInfo(shape, surface));
                 }
                 //set level design with proper values
-                levelDesign.Init(_category, _level, startX, startY, endX, endY, platformEnvironment, platformMovable);
+                levelDesign.Init(_category, _level, time, startX, startY, endX, endY, platformEnvironment, platformMovable);
             }
             
         }

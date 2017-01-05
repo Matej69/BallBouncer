@@ -87,7 +87,7 @@ public class KeyCombos : MonoBehaviour {
             return true;
         if (_sc == e_keyShortcut.END_LINE && key_down[KeyCode.W])
             return true;
-        if (_sc == e_keyShortcut.CHANGE_MOUSE_INTERACTION && key_down[KeyCode.Alpha1])
+        if (_sc == e_keyShortcut.CHANGE_MOUSE_INTERACTION && key_down[KeyCode.F1])
             return true;
         if (_sc == e_keyShortcut.DELETE_SELECTED_OBJECT && key_down[KeyCode.Delete])
             return true;
@@ -118,8 +118,8 @@ public class KeyCombos : MonoBehaviour {
             key_down[KeyCode.Q] = false;
         if (_sc == e_keyShortcut.END_LINE && key_down[KeyCode.W])
             key_down[KeyCode.W] = false;
-        if (_sc == e_keyShortcut.CHANGE_MOUSE_INTERACTION && key_down[KeyCode.Alpha1])
-            key_down[KeyCode.Alpha1] = false;
+        if (_sc == e_keyShortcut.CHANGE_MOUSE_INTERACTION && key_down[KeyCode.F1])
+            key_down[KeyCode.F1] = false;
         if (_sc == e_keyShortcut.DELETE_SELECTED_OBJECT && key_down[KeyCode.Delete])
             key_down[KeyCode.Delete] = false;
         if (_sc == e_keyShortcut.COPY_SELECTED_OBJECT && key_down[KeyCode.C])
