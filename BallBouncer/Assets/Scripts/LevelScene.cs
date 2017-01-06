@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class LevelScene : MonoBehaviour {
 
-    public int category;
+    public int world;
     public int level;
 
     List<GameObject> list_environmentPlatforms = new List<GameObject>();
@@ -15,24 +15,30 @@ public class LevelScene : MonoBehaviour {
 
     GameObject box;
     bool areMovablePlatSpawned = false;
-    bool isLevelFinished = false;  
+    bool isLevelFinished = false;
+
+    float timePlaying = 0;   
+
+    Timer afterFinishedTimer; 
 
     // Use this for initialization
     void Start () {
-        category = PlayerPrefs.GetInt("worldToLoad");
-        level = PlayerPrefs.GetInt("levelToLoad");
+        world = GlobalSettings.worldToLoad;
+        level = GlobalSettings.levelToLoad;
+        afterFinishedTimer = new Timer(2);
 
         CreateBox();        
-        InitLevel(category, level);
+        InitLevel(world, level);
         CreateBall();   //must go after InitLevel()
         
     }
 	
 	// Update is called once per frame
 	void Update () {
-        HandleLevelDoneState();
+        HandleLevelDoneState();        
 
         HandleBallReset();
+        TimeLeftHandler();
         HandleMovablePlatformsLoad();
 
     }
@@ -53,7 +59,7 @@ public class LevelScene : MonoBehaviour {
         LevelDesignInfo levelDesign = LevelDesignInfo.LoadLevelDesign(_category, _level);
 
         //set current category and level
-        category = levelDesign.categoryID;
+        world = levelDesign.categoryID;
         level = levelDesign.levelID;
 
         //set environment platforms
@@ -83,7 +89,7 @@ public class LevelScene : MonoBehaviour {
 
     void HandleMovablePlatformsLoad() {
         if ( !areMovablePlatSpawned && box.GetComponent<BoxWithPlatforms>().readyToSpawnPlatforms) { 
-            LoadMovablePlatforms(category, level);
+            LoadMovablePlatforms(world, level);
             areMovablePlatSpawned = true;
             }
     }
@@ -169,10 +175,45 @@ public class LevelScene : MonoBehaviour {
         return false;
     }
 
-    void HandleLevelDoneState() {
-        if (IsBallTouchingFinish())
-            isLevelFinished = true;
+
+    void TimeLeftHandler() {
+        timePlaying += Time.deltaTime;
     }
+
+    void DestroyLevelObjects() {        
+        for(int i = list_environmentPlatforms.Count - 1; i >= 0; --i) {
+            Destroy(list_environmentPlatforms[i]);
+        }
+        for(int i = list_movablePlatforms.Count - 1; i >= 0; --i) {
+            Destroy(list_movablePlatforms[i]);
+        }
+        Destroy(startLine);
+        Destroy(endLine);
+        Destroy(ball);
+    }
+
+    void HandleLevelDoneState() {
+        if (IsBallTouchingFinish() && !isLevelFinished)
+            isLevelFinished = true;
+
+        if (!isLevelFinished)
+            return;
+
+        GlobalSettings.finishTime = timePlaying;
+        //keep ball on the same position if level is finished        
+        ball.GetComponent<Rigidbody2D>().isKinematic = true;
+
+        afterFinishedTimer.Tick(Time.deltaTime);
+        if (afterFinishedTimer.IsFinished()) {            
+            ScreenPrefabHolder prefabHolder = GameObject.Find("ScreenPrefabHolder").GetComponent<ScreenPrefabHolder>();
+            Instantiate(prefabHolder.GetPrefab(ScreenPrefabHolder.e_screenID.AFTER_LEVEL_FINISHED), new Vector2(0, 0), Quaternion.identity);
+            DestroyLevelObjects();
+            Destroy(gameObject);
+        }
+
+    }
+
+    
 
     
 

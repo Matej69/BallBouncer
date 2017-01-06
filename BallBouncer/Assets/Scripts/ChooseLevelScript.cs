@@ -32,12 +32,10 @@ public class ChooseLevelScript : MonoBehaviour {
 
     public GameObject[] slotList;
     int selectedWorld = 1;
-    int selectedLevel = 0;
+    int selectedLevel = 1;
 
 
     void Start() {
-        //PlayerPrefs.SetInt("WORLD_COUNT",2);
-        //PlayerPrefs.SetInt("LEVEL_COUNT", 16);
 
         InitRefrences();        
         SetLevelSlots(1);
@@ -79,7 +77,7 @@ public class ChooseLevelScript : MonoBehaviour {
 
         //RIGHT BUTTON...
         rightBtn.onClick.AddListener(delegate {
-            if (selectedWorld + 1 > 2)
+            if (selectedWorld + 1 > GlobalSettings.WORLD_COUNT)
                 return;
             selectedWorld++;
             SetLevelSlots(selectedWorld);
@@ -112,7 +110,7 @@ public class ChooseLevelScript : MonoBehaviour {
     void SetLevelSlots(int worldID) {
         //call LoadLevelDesign for all 16 levels for given world(worldID)
         List<LevelDesignInfo> levelDesignInfo = new List<LevelDesignInfo>();
-        for (int currLvlID = 1; currLvlID < 17; ++currLvlID)
+        for (int currLvlID = 1; currLvlID < GlobalSettings.LEVEL_COUNT + 1; ++currLvlID)
             if(LevelDesignInfo.DoesLevelDesignExists(worldID, currLvlID))
                 levelDesignInfo.Add(LevelDesignInfo.LoadLevelDesign(worldID, currLvlID));
 
@@ -126,18 +124,20 @@ public class ChooseLevelScript : MonoBehaviour {
             Image medalImg = slotList[info.levelID-1].transform.FindChild("medal").GetComponent<Image>();
             Text slotText = slotList[info.levelID - 1].transform.FindChild("Text").GetComponent<Text>();
 
+            slotText.text = info.levelID.ToString();
             //-->if time = 777 make slot gray an without medal(create lock instead)(can be played unitl prev level is finished)
             //-->else if time is 888 make slot colored but without any icon(can be played but was never finished)
             //-->else if time is > 0 && < 15 make slot colored and give it a proper medal(played and medal achieved)
-            if (info.time == 777) {
+            if (info.time == 777.0f) {
                 medalImg.sprite = locked;
                 slotText.color = new Color32(75, 75, 75, 255);
                 slotText.color = new Color32(0, 0, 0, 0);
                 slotImg.sprite = lockedSlot;
             }
-            else if(info.time == 888) {
+            else if(info.time == 888.0f) {
                 slotText.color = new Color32(122, 68, 0, 255);
-                medalImg.sprite = emptySprite;                                
+                medalImg.sprite = emptySprite;
+                slotImg.sprite = normalSlot;
             }
             else {
                 slotImg.sprite = normalSlot;
@@ -153,13 +153,13 @@ public class ChooseLevelScript : MonoBehaviour {
     }
 
     void CreateLevelObject(int _world, int _level) {
-        if (selectedLevel < 1 || selectedLevel > 16 || selectedWorld < 1)
+        if (selectedLevel < 1 || selectedLevel > GlobalSettings.LEVEL_COUNT || selectedWorld < 1)
             return;
 
         Debug.Log(selectedWorld + " " + selectedLevel);
 
-        PlayerPrefs.SetInt("worldToLoad", _world);
-        PlayerPrefs.SetInt("levelToLoad", _level);
+        GlobalSettings.worldToLoad = _world;
+        GlobalSettings.levelToLoad = _level;
         Instantiate(ScreenPrefabHolder.s_instance.GetPrefab(ScreenPrefabHolder.e_screenID.LEVEL));
         Destroy(gameObject);
     }
@@ -169,7 +169,7 @@ public class ChooseLevelScript : MonoBehaviour {
         string selectedSlot = slotList[_level - 1].GetComponent<Image>().sprite.name;
         bool isLocked = (selectedSlot == "lockedLevel") ? true : false;
 
-        if (_level < 1 || _level > 16 || isLocked)
+        if (_level < 1 || _level > GlobalSettings.LEVEL_COUNT || isLocked)
             return;
         else
             selectedLevel = _level;            

@@ -70,7 +70,9 @@
     <Compile Include="Assets\Scripts\CameraRatio.cs" />
     <Compile Include="Assets\Scripts\ChooseLevelScript.cs" />
     <Compile Include="Assets\Scripts\Editor.cs" />
+    <Compile Include="Assets\Scripts\GlobalSettings.cs" />
     <Compile Include="Assets\Scripts\KeyCombos.cs" />
+    <Compile Include="Assets\Scripts\LevelCleared.cs" />
     <Compile Include="Assets\Scripts\LevelDesignInfo.cs" />
     <Compile Include="Assets\Scripts\LevelObjectsPrefabHolder.cs" />
     <Compile Include="Assets\Scripts\LevelScene.cs" />

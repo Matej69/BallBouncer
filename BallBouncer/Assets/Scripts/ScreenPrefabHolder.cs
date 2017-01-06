@@ -9,13 +9,15 @@ public class ScreenPrefabHolder : MonoBehaviour {
         LEVEL_CHOICE,
         EDITOR,
         LEVEL,
-        MAIN_MENU
+        MAIN_MENU,
+        AFTER_LEVEL_FINISHED
     }
 
     public GameObject levelChoice;
     public GameObject editor;
     public GameObject level;
     public GameObject mainMenu;
+    public GameObject afterLevelFinished;
 
     void Awake() {
         if(s_instance == null)
@@ -39,6 +41,7 @@ public class ScreenPrefabHolder : MonoBehaviour {
             case e_screenID.EDITOR: return editor;
             case e_screenID.LEVEL: return level;
             case e_screenID.MAIN_MENU: return mainMenu;
+            case e_screenID.AFTER_LEVEL_FINISHED: return afterLevelFinished;
             default: return null;
         }
     }
