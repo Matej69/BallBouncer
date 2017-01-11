@@ -15,6 +15,10 @@ public class MainMenu : MonoBehaviour {
     Button muteBtn;
     Button exitBtn;
 
+    void Awake() {
+        LevelDesignInfo.InitJSONFileOnDeviceMemoryIfNeeded();
+    }
+
     // Use this for initialization
     void Start () {
         playBtn = playBtnObj.GetComponent<Button>();

@@ -307,19 +307,17 @@ public class Editor : MonoBehaviour {
             else
                 onSaveErrorText.GetComponent<Text>().text = "SUSCESSFULLY CHECKED";
             //set-up all info that will be written in JSON file and save it
-            Debug.Log("flag 1");
             List<PlatformMovableInfo> movableInfo = GetMovablePlatInfoFromInput();
             List<PlatformEnvironmentInfo> environmentInfo = GetEnvironmentPlatInfo();
-            Debug.Log("flag 2");
+
             double startX = start_line.transform.position.x;
             double startY = start_line.transform.position.y;
             double endX = end_line.transform.position.x;
             double endY = end_line.transform.position.y;
-            Debug.Log("flag 3");
+
             //apply info to object that is used for JSON and save it
             LevelDesignInfo levelDesign = new LevelDesignInfo(categoryID, levelID, 777, startX, startY, endX, endY, environmentInfo, movableInfo);
             LevelDesignInfo.SaveLevelDesign(levelDesign);
-            Debug.Log("flag 4");
         });
     }
 

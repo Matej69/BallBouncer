@@ -11,6 +11,13 @@ public class LevelCleared : MonoBehaviour {
     public GameObject timeTxtObj;
     public GameObject medalImgObj;
 
+    public Sprite goldMedal;
+    public Sprite silverMedal;
+    public Sprite bronceMedal;
+    Timer medalIncSizeTimer;
+    Timer medalDecSizeTimer;
+    Vector3 targetMedalSize;
+
     Button homeBtn;
     Button nextBtn;
     Button restartBtn;
@@ -19,6 +26,7 @@ public class LevelCleared : MonoBehaviour {
 
     float finishTime;
     float currDisplayTime;
+    bool isTimeCountFinished;
 
     // Use this for initialization
     void Start () {
@@ -27,12 +35,17 @@ public class LevelCleared : MonoBehaviour {
 
         finishTime = GlobalSettings.finishTime;
         currDisplayTime = 0;
+        isTimeCountFinished = false;
+
+        targetMedalSize = medalImgObj.transform.localScale;
+        medalIncSizeTimer = new Timer(0.4f);
+        medalDecSizeTimer = new Timer(1f);        
     }
 	
 	// Update is called once per frame
 	void Update () {
         HandleFinishGUIText();
-        Debug.Log(GlobalSettings.finishTime);
+        HandleMedalEffect();
     }
     
 
@@ -84,13 +97,49 @@ public class LevelCleared : MonoBehaviour {
     }
 
     void HandleFinishGUIText() {
-        //Debug.Log("currTime " + currDisplayTime + " finishTime " + finishTime);
+        if (isTimeCountFinished)
+            return;
+            
         if(currDisplayTime > finishTime) {
             timeTxt.text = Math.Round(finishTime, 2).ToString();
+            isTimeCountFinished = true;
             return;
         }
-        currDisplayTime += 0.1f;
+        float secondsIncFactor = 10 * Time.deltaTime;
+        currDisplayTime += secondsIncFactor;
         timeTxt.text = Math.Round(currDisplayTime,2).ToString();
+
+    }
+
+    void HandleMedalEffect() {
+        if (!isTimeCountFinished)
+            return;
+
+        if (finishTime > 0 && finishTime <= 5)
+            medalImg.sprite = goldMedal;
+        else if (finishTime > 5 && finishTime <= 10)
+            medalImg.sprite = silverMedal;
+        else if (finishTime > 10 && finishTime <= 15)
+            medalImg.sprite = bronceMedal;
+
+        Vector3 medalScale = medalImgObj.transform.localScale;
+
+        if (!medalIncSizeTimer.IsFinished()) {
+            float scaleIncFactor = 2.8f * Time.deltaTime;
+            medalScale = new Vector3(medalScale.x + scaleIncFactor, medalScale.y + scaleIncFactor, medalScale.z);
+            medalImgObj.transform.localScale = medalScale;
+
+            medalIncSizeTimer.Tick(Time.deltaTime);
+        }
+
+        if (!medalDecSizeTimer.IsFinished() && medalIncSizeTimer.IsFinished() && medalScale.x > targetMedalSize.x && medalScale.y > targetMedalSize.y) {
+            float scaleIncFactor = 5f * Time.deltaTime;
+            medalScale = new Vector3(medalScale.x - scaleIncFactor, medalScale.y - scaleIncFactor, medalScale.z);
+            medalImgObj.transform.localScale = medalScale;
+
+            medalDecSizeTimer.Tick(Time.deltaTime);
+        }
+
 
     }
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public class LevelScene : MonoBehaviour {
 
@@ -19,7 +20,7 @@ public class LevelScene : MonoBehaviour {
 
     float timePlaying = 0;   
 
-    Timer afterFinishedTimer; 
+    Timer afterFinishedTimer;
 
     // Use this for initialization
     void Start () {
@@ -29,8 +30,7 @@ public class LevelScene : MonoBehaviour {
 
         CreateBox();        
         InitLevel(world, level);
-        CreateBall();   //must go after InitLevel()
-        
+        CreateBall();   //must go after InitLevel()        
     }
 	
 	// Update is called once per frame
@@ -189,7 +189,10 @@ public class LevelScene : MonoBehaviour {
         }
         Destroy(startLine);
         Destroy(endLine);
+
+        ball.GetComponent<Ball>().DestroyWaves();
         Destroy(ball);
+
     }
 
     void HandleLevelDoneState() {
@@ -197,21 +200,51 @@ public class LevelScene : MonoBehaviour {
             isLevelFinished = true;
 
         if (!isLevelFinished)
-            return;
+            return;        
 
         GlobalSettings.finishTime = timePlaying;
         //keep ball on the same position if level is finished        
         ball.GetComponent<Rigidbody2D>().isKinematic = true;
+        ball.GetComponent<Ball>().isAtFinishLine = true;
 
         afterFinishedTimer.Tick(Time.deltaTime);
-        if (afterFinishedTimer.IsFinished()) {            
+        if (afterFinishedTimer.IsFinished()) {
+            LevelDesignInfo.SetTimeChangesOnLevelComplete(world, level, timePlaying);
             ScreenPrefabHolder prefabHolder = GameObject.Find("ScreenPrefabHolder").GetComponent<ScreenPrefabHolder>();
             Instantiate(prefabHolder.GetPrefab(ScreenPrefabHolder.e_screenID.AFTER_LEVEL_FINISHED), new Vector2(0, 0), Quaternion.identity);
             DestroyLevelObjects();
             Destroy(gameObject);
         }
+    }
+
+    /*
+    void SetJSONTimeChanges() {
+        //set medal for this level
+        LevelDesignInfo thisInfo = LevelDesignInfo.LoadLevelDesign(world, level);
+        if(timePlaying < thisInfo.time && timePlaying >= 0 && timePlaying <= 15) {
+            /LevelDesignInfo.SetTime(world, level, timePlaying);
+            }
+
+        //unlock next level if it's not already unlocked
+        int nextLevel = level;
+        int nextWorld = world;
+        if (level != 16)
+            nextLevel++;
+        else if(level == 16 && world != GlobalSettings.WORLD_COUNT) {
+            nextLevel = 1;
+            nextWorld++;
+        }
+
+        LevelDesignInfo nextInfo = LevelDesignInfo.LoadLevelDesign(nextWorld, nextLevel);
+        if (nextInfo.time == 777.0f) { 
+            LevelDesignInfo.SetTime(nextWorld, nextLevel, 888.0f);
+        }
 
     }
+    */
+
+
+
 
     
 

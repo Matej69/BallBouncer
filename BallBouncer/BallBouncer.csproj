@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\BoxWithPlatforms.cs" />
     <Compile Include="Assets\Scripts\CameraRatio.cs" />
     <Compile Include="Assets\Scripts\ChooseLevelScript.cs" />

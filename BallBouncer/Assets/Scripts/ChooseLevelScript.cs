@@ -35,7 +35,7 @@ public class ChooseLevelScript : MonoBehaviour {
     int selectedLevel = 1;
 
 
-    void Start() {
+    void Start() {        
 
         InitRefrences();        
         SetLevelSlots(1);
@@ -155,8 +155,6 @@ public class ChooseLevelScript : MonoBehaviour {
     void CreateLevelObject(int _world, int _level) {
         if (selectedLevel < 1 || selectedLevel > GlobalSettings.LEVEL_COUNT || selectedWorld < 1)
             return;
-
-        Debug.Log(selectedWorld + " " + selectedLevel);
 
         GlobalSettings.worldToLoad = _world;
         GlobalSettings.levelToLoad = _level;
